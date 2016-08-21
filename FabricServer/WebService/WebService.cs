@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Fabric;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
+using System.Fabric.Description;
 
 namespace WebService
 {
@@ -24,7 +22,13 @@ namespace WebService
         /// <returns>A collection of listeners.</returns>
         protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
         {
-            return new ServiceInstanceListener[0];
+            //Get all available HTTP endpoint on this service
+            var endpoints = Context.CodePackageActivationContext.GetEndpoints()
+                           .Where(endpoint => endpoint.Protocol == EndpointProtocol.Http || endpoint.Protocol == EndpointProtocol.Https)
+                           .Select(endpoint => endpoint.Name);
+            //return the listener for each endpoint
+            return endpoints.Select(endpoint => new ServiceInstanceListener(
+                serviceContext => new CommunicationListener(Startup.ConfigureApp, serviceContext, ServiceEventSource.Current, endpoint), endpoint));
         }
     }
 }

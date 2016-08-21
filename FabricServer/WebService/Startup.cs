@@ -16,7 +16,13 @@ namespace WebService
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
-            
+
+            // Special Shortcut Route for receiving a string from client
+            config.Routes.MapHttpRoute(
+                name: "Recieve String",
+                routeTemplate: "msg:{msg}",
+                defaults: new { controller = "message" }
+            );
 
             appBuilder.UseWebApi(config);
         }
