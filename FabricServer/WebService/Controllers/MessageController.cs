@@ -1,21 +1,27 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace WebService.Controllers
 {
     public class MessageController : ApiController
     {
-        [AcceptVerbs("GET", "POST")]
-        public string RecieveMsg(string msg)
+        [HttpGet]
+        public string Msg(string msg)
         {
             ServiceEventSource.Current.Message("A client has sent a message: " + msg);
             return "You have said : '" + msg + "' to the server!";
         }
+        [HttpPost]
+        public async Task<string> PostMsg([FromBody]string msg)
+        {
+            ServiceEventSource.Current.Message("request detail: \n" + Request);
+            string content = await Request.Content.ReadAsStringAsync();
+            ServiceEventSource.Current.Message("body: " + content);
 
-        //public string Get(string msg)
-        //{
-        //    ServiceEventSource.Current.Message("A client has sent a message: " + msg);
-        //    return "You have said : '" + msg + "' to the server!";
-        //}
+
+            ServiceEventSource.Current.Message("A client has sent a message: " + msg);
+            return "You have said : '" + msg + "' to the server!";
+        }
     }
 }
