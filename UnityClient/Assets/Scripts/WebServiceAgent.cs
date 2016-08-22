@@ -2,6 +2,7 @@
 using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 public class WebServiceAgent : MonoBehaviour {
 	[HideInInspector]
@@ -13,7 +14,10 @@ public class WebServiceAgent : MonoBehaviour {
 	//Might need to change these to setting from file, for easy config
 	string URL = "localhost";
 	int Port = 25331;
+
+	string connectionString;
 	UnityWebRequest  con;
+
 	void Start () {
 		if (instance == null) {
 			instance = this;
@@ -25,20 +29,7 @@ public class WebServiceAgent : MonoBehaviour {
 	void Initialize()
 	{
 		//Initialize the URL for communicating with the server
-		string connectionString = "http://" + URL + ":" + Port + "/api/message";
-
-		//We use simple GET method on Http Protocol, so we utilize the WWW class of mono to handle things
-//		con = new WWW(connectionString + "?msg=" + System.Uri.EscapeDataString(message));
-
-		//TODO might need to change to POST method with proper data model if we send more complicated data.
-		Dictionary<string, string> headers = new Dictionary<string, string>();
-		headers.Add("Content-Type", "application/json");
-		headers.Add("Content-Length", message.Length.ToString());
-
-		WWWForm form = new WWWForm();
-		form.AddField("msg", message);
-
-		con = UnityWebRequest.Post(connectionString, form);
+		connectionString = "http://" + URL + ":" + Port + "/api/message";
 	}
 
 
@@ -52,8 +43,16 @@ public class WebServiceAgent : MonoBehaviour {
 
     IEnumerator Connect_Proceed()
     {
-		Debug.Log ("Sending message 'Hello' to the server...");
-        
+		
+		//We use POST method with proper data model to support more complicated data communication in the future.
+		string data = JsonUtility.ToJson(new DataModel(message));
+		Debug.Log ("Sending message to the server... : " + data);
+		con = new UnityWebRequest(connectionString, "POST");
+		byte[] body = Encoding.UTF8.GetBytes(data);
+		con.uploadHandler = new UploadHandlerRaw(body);
+		con.downloadHandler = new DownloadHandlerBuffer();
+		con.SetRequestHeader("Content-Type", "application/json");
+		//Start communication
 		yield return con.Send();
 
 		if (con.error != null) {
@@ -63,6 +62,21 @@ public class WebServiceAgent : MonoBehaviour {
 
 		string response = con.downloadHandler.text;
 		Debug.Log ("The response from server: " + response);
+
+		con.Dispose ();
     }
+
+    
+	//================= Data Model ================
+	[System.Serializable]
+	public class DataModel
+	{
+		public string msg;
+
+		public DataModel(string msg)
+		{
+			this.msg = msg;
+		}
+	}
 }
 

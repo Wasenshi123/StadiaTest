@@ -1,27 +1,21 @@
 ﻿using System.Web.Http;
 using Owin;
 
-namespace WebService
+namespace WebApiTest
 {
-    public class Startup
+    public static class Startup
     {
+        // This code configures Web API. The Startup class is specified as a type
+        // parameter in the WebApp.Start method.
         public static void ConfigureApp(IAppBuilder appBuilder)
         {
             // Configure Web API for self-host. 
             HttpConfiguration config = new HttpConfiguration();
 
-            // Default Route pattern for this Service
             config.Routes.MapHttpRoute(
-                name: "Default Api",
+                name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
-            );
-
-            // Special Shortcut Route for receiving a string from client
-            config.Routes.MapHttpRoute(
-                name: "Recieve String",
-                routeTemplate: "msg:{msg}",
-                defaults: new { controller = "message"}
             );
 
             appBuilder.UseWebApi(config);
