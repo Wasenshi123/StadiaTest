@@ -21,7 +21,7 @@ namespace WebService
             config.Routes.MapHttpRoute(
                 name: "Recieve String",
                 routeTemplate: "msg:{msg}",
-                defaults: new { controller = "message" }
+                defaults: new { controller = "message"}
             );
 
             appBuilder.UseWebApi(config);
