@@ -12,7 +12,7 @@ This could easily be an architecture for mobile game that run the service world-
 
 You can follow the suggestion from micosoft here (https://docs.microsoft.com/en-us/azure/service-fabric/service-fabric-get-started) and install all the programs
 
-Or just open the server project with visual studio and run it.
+Or long story short, just open the server project with visual studio and run it.
 
 
 
